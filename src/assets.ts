@@ -1,0 +1,1 @@
+export const loadingImgUri = 'https://shdw-drive.genesysgo.net/2HozGU2Lm4VWaZ19bX7eJvizZySGms6eBoJrcWwhXsCW/loading.gif';

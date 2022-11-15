@@ -1,0 +1,29 @@
+{
+  "name": "sharebear",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "xnft build",
+    "start": "xnft watch",
+    "dev": "xnft dev"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@coral-xyz/xnft-cli": "*"
+  },
+  "dependencies": {
+    "@project-serum/anchor": "^0.25.0",
+    "@shadow-drive/sdk": "^3.0.8",
+    "assert": "^2.0.0",
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.3.0",
+    "process": "^0.11.10",
+    "react": "^17.0.2",
+    "react-xnft": "*",
+    "stream-browserify": "^3.0.0",
+    "string_decoder": "^1.3.0",
+    "util": "^0.12.5"
+  }
+}
