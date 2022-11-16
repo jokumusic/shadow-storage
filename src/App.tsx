@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
-import { Stack, View } from "react-xnft";
+import { Stack, View, Text } from "react-xnft";
 import { GlobalContext } from "./GlobalProvider";
 import {HomeScreen} from "./HomeScreen";
 import {CreateStorageScreen} from "./CreateStorageScreen";
 import {FileViewScreen} from "./FileViewScreen";
 import {ManageStorageScreen} from "./ManageStorageScreen";
 import {TestScreen} from "./TestScreen";
+import {Balance} from "./components/Balance";
 
 
 export function App() {
@@ -13,14 +14,19 @@ export function App() {
 
     return (
     <View style={{ background: "black", height: "100%" }}>
+      <View style={{display:'flex', alignContent:'center', justifyContent: 'center', alignSelf: 'center', height: 25}}>
+        <Balance />
+      </View>
+      
       <Stack.Navigator
         initialRoute={{ name: "home-screen" }}
         style={{
           display: "flex",
           justifyContent: "center",
           alignContent: 'center',
+          height:20,
         }}
-        titleStyle={{display: 'flex', justifyContent: 'start', fontSize: 18}}
+        titleStyle={{display: 'flex', justifyContent: 'start', fontSize: 18, height:0}}
         options={
           ({ route }) => {
           switch (route.name) {

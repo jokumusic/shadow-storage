@@ -80,12 +80,11 @@ export function ManageStorageScreen() {
                 <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
             }
 
-            <View style={{display:'flex', flexDirection:'row', borderColor:'green', borderWidth:1}}>
-                <Balance />
-                <Button style={{alignSelf: 'flex-end', marginLeft:30}} onClick={()=>nav.push("create-storage-screen")}>Create Storage</Button>
+            <View style={{width:'100%', display:'flex', flexDirection:'row', alignContent:'flex-end', justifyContent:'flex-end', padding: 5, marginTop:10}}>
+                <Button style={{padding:4, marginLeft:5, fontSize: 14}} onClick={()=>nav.push("create-storage-screen")}>Create Storage</Button>
             </View>        
 
-            <View style={{marginTop:20}}>
+            <View style={{marginTop:10}}>
                 { globalContext.shdwAccounts?.length &&
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text style={{marginRight: 7}}>Storage:</Text>
@@ -99,21 +98,21 @@ export function ManageStorageScreen() {
             </View>
 
             {showLoadingImage ||
-                <View style={{display:'flex', flexDirection:'row', alignContent: 'center', alignSelf: 'center'}}>
+                <View style={{display:'flex', flexDirection:'row', alignContent: 'center', alignSelf: 'center', marginTop: 10}}>
                     <Button style={styles.buttonStyle} onClick={()=>storageResize()}>Resize</Button>
                     <Button style={styles.buttonStyle} onClick={()=>currentStorageInfo?.to_be_deleted ? storageUnDelete() : storageDelete()}>{currentStorageInfo?.to_be_deleted ? "UnDelete" : "Delete"}</Button>
                 </View>
             }
             
 
-            <View style={{marginTop: 10, borderWidth:1, borderColor:'white', margin: 2}}>
+            <View style={{marginTop: 20, borderWidth:1, borderColor:'white', margin: 2}}>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Identifier:</Text>
                     <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.identifier}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>PublicKey:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.storage_account}</Text>
+                    <Text style={{color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{currentStorageInfo?.storage_account}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Currently Used Bytes:</Text>
@@ -145,7 +144,7 @@ export function ManageStorageScreen() {
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Owner1:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.owner1}</Text>
+                    <Text style={{color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{currentStorageInfo?.owner1}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Account Counter Seed:</Text>

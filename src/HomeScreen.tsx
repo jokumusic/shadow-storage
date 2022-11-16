@@ -11,17 +11,15 @@ import {SelectList} from "./components/SelectList";
 import {Balance} from "./components/Balance";
 import {StorageAccountList} from "./components/StorageAccountList";
 import * as styles from "./styles";
-import {loadingImgUri} from "./assets";
+import {loadingImgUri, fileListIconUri} from "./assets";
 
-
-const icon = "https://aux.iconspalace.com/uploads/finder-circle-icon-256.png";
 
 export function HomeScreen() {
   const globalContext = useContext(GlobalContext);
   const connection = useConnection();
   const wallet = usePublicKey();
   const nav = useNavigation();
-  const [currentStorageAccount, setCurrentStorageAccount] = useState();
+  const [currentStorageAccount, setCurrentStorageAccount] = useState(nav.activeRoute.props?.storageInfo);
   const [currentStorageFiles, setCurrentStorageFiles] = useState([]);
   const [message, setMessage] = useState("");
   const [showLoadingImage, setShowLoadingImage] = useState(false);
@@ -66,7 +64,16 @@ export function HomeScreen() {
 
     if(uploads) {
       console.log('ttt shdw uploads: ', uploads);
-      setMessage("");      
+      const failures = uploads
+        .filter(u=>!u.location)
+        .map(f=> `${f.fileName}: ${f.status}`);
+
+      if(failures) {
+        setMessage(failures.join(failures));
+      } else {
+        setMessage("");
+      }
+
       const fileGroup = await globalContext.shdwDrive
         .listObjects(storageKey)
         .catch(err=>setMessage(err.toString()));
@@ -102,42 +109,47 @@ export function HomeScreen() {
           <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
       }
 
-      <View style={{display:'flex', flexDirection:'row', borderColor:'green', borderWidth:1}}>
-        <Balance />
-        <Button
-          style={{alignSelf: 'flex-end', marginLeft:30}}
-          onClick={()=>nav.push("manage-storage-screen", {storageAccount: currentStorageAccount})}
-        >
-          Manage Storage
-        </Button>
-      </View>
-
-      <View style={{display:'flex', flexDirection:'column', alignContent:'center', alignSelf:'center', justifyContent: 'center', marginTop:20}}>
+      <View style={{width:'100%', display:'flex', flexDirection:'row', alignContent:'flex-end', justifyContent:'space-between', padding: 5}}>
+      { globalContext.shdwAccounts?.length &&
         
-        { globalContext.shdwAccounts?.length &&
-        <>
           <View style={{display:'flex', flexDirection:'row'}}>
             <Text style={{marginRight:5}}>Storage:</Text>
             <StorageAccountList
+              style={{fontSize: 14, padding:5, color:'black', height: 30, marginRight:5}}
               onChange={(e)=> onSelectedAccountChange(e.target.value)}
               selector={(a)=>currentStorageAccount?.account?.identifier == a.account.identifier}
             />
-          </View>        
-
-          <View style={{marginTop: 10}}>
-            <FileInput onChange={(e)=>uploadFiles(e.target.files)} multiple={true} />
           </View>
-        </>
         }
-      </View>      
+
+        <Button
+          style={{padding:4, marginLeft:5, fontSize: 14}}
+          onClick={()=>nav.push("manage-storage-screen", {storageAccount: currentStorageAccount})}
+        >
+          Manage Storage
+        </Button>        
+
+      </View>
+
+      <View style={{marginLeft:10, marginTop: 20}}>
+        <FileInput onChange={(e)=>uploadFiles(e.target.files)} multiple={true} />
+      </View>  
+
 
       <View style={{marginTop: 20}}>
         <BalancesTable>
-          <BalancesTableHead title={`${currentStorageAccount?.account?.identifier} Files`} iconUrl={icon} />
+          <BalancesTableHead title={`${currentStorageAccount?.account?.identifier} Files`} iconUrl={fileListIconUri} />
           <BalancesTableContent>
             { currentStorageFiles?.length && 
               currentStorageFiles.map((f,i)=>(
-                <BalancesTableRow key={`file_${i}`} onClick={()=>nav.push("file-view-screen", {url:`https://shdw-drive.genesysgo.net/${currentStorageAccount?.publicKey}/${f}`})}>
+                <BalancesTableRow
+                  key={`file_${i}`}
+                  onClick={()=> nav.push("file-view-screen", {
+                      fileName: f,
+                      accountKey: currentStorageAccount.publicKey,
+                    })
+                  }
+                >
                   <BalancesTableCell title={f} />
                 </BalancesTableRow>
               ))
