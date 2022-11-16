@@ -4,6 +4,8 @@ import { GlobalContext } from "./GlobalProvider";
 import {HomeScreen} from "./HomeScreen";
 import {CreateStorageScreen} from "./CreateStorageScreen";
 import {FileViewScreen} from "./FileViewScreen";
+import {ManageStorageScreen} from "./ManageStorageScreen";
+import {TestScreen} from "./TestScreen";
 
 
 export function App() {
@@ -34,6 +36,14 @@ export function App() {
               return {
                 title: "",
               };
+            case "manage-storage-screen":
+              return {
+                title: "",
+              };            
+            case "test-screen":
+              return {
+                title: "test",
+              }
             default:
               throw new Error("unknown route");
           }
@@ -50,6 +60,14 @@ export function App() {
          <Stack.Screen
           name={"file-view-screen"}
           component={(props: any) => <FileViewScreen {...props} />}
+        />
+        <Stack.Screen
+          name={"manage-storage-screen"}
+          component={(props: any) => <ManageStorageScreen {...props} />}
+        />
+         <Stack.Screen
+          name={"test-screen"}
+          component={(props: any) => <TestScreen {...props} />}
         />
 
       </Stack.Navigator>

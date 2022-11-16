@@ -8,20 +8,13 @@ import {GlobalContext} from './GlobalProvider';
 import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
 import {FileInput} from "./components/FileInput";
 import {SelectList} from "./components/SelectList";
+import {Balance} from "./components/Balance";
+import {StorageAccountList} from "./components/StorageAccountList";
 import * as styles from "./styles";
 import {loadingImgUri} from "./assets";
 
 
 const icon = "https://aux.iconspalace.com/uploads/finder-circle-icon-256.png";
-
-//
-// On connection to the host environment, warm the cache.
-//
-ReactXnft.events.on("connect", () => {
-  // no-op
-});
-
-
 
 export function HomeScreen() {
   const globalContext = useContext(GlobalContext);
@@ -55,10 +48,7 @@ export function HomeScreen() {
      
   },[currentStorageAccount]);
 
-  async function getStorageAccount() {
-    const acct = await globalContext.shdwDrive.getStorageAccount(new PublicKey("CQ87QonbT4VWyFZyQVYaHBsvuxc1eeTRUN9gBnZUKoSA"));
-    console.log('ttt acct: ', acct);
-  }
+
 
   async function uploadFiles(files) {
     console.log('ttt in uploadfiles', files);
@@ -112,42 +102,34 @@ export function HomeScreen() {
           <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
       }
 
-
-      <View style={{display:'flex', flexDirection: 'row', marginBottom: 20}}>
-        <View style={{display: 'flex', flexDirection: 'row', marginLeft: 5,}}>
-          SOL: 
-          <Text style={{marginLeft:2, color:'yellow'}}>{globalContext.solBalance.toFixed(3)}</Text>
-        </View>
-        <View style={{display: 'flex', flexDirection: 'row', marginLeft: 10,}}>
-          SHDW: 
-          <Text style={{marginLeft:2, color:'yellow'}}>{(globalContext.shdwTokenInfo?.amount / 1000000000).toFixed(3)}</Text>
-        </View>
+      <View style={{display:'flex', flexDirection:'row', borderColor:'green', borderWidth:1}}>
+        <Balance />
+        <Button
+          style={{alignSelf: 'flex-end', marginLeft:30}}
+          onClick={()=>nav.push("manage-storage-screen", {storageAccount: currentStorageAccount})}
+        >
+          Manage Storage
+        </Button>
       </View>
 
-      <View style={{display:'flex', flexDirection:'column', alignContent:'center', alignSelf:'center', justifyContent: 'center', marginLeft: 5}}>
-        <View style={{flexDirection: 'row'}}>
-          { globalContext.shdwAccounts?.length &&
-            <SelectList 
-              style={{color:'black'}}
-              onChange={(e)=> onSelectedAccountChange(e.target.value)}
-              options={
-                globalContext.shdwAccounts.map(a=>({
-                    label: a.account.identifier,
-                    value: a.account.identifier,
-                    selected: currentStorageAccount?.account?.identifier == a.account.identifier
-                }))
-              }
-            />
-          }
+      <View style={{display:'flex', flexDirection:'column', alignContent:'center', alignSelf:'center', justifyContent: 'center', marginTop:20}}>
         
-          <Button style={styles.buttonStyle} onClick={()=>nav.push("create-storage-screen")}>Create Storage</Button>
-        </View>
+        { globalContext.shdwAccounts?.length &&
+        <>
+          <View style={{display:'flex', flexDirection:'row'}}>
+            <Text style={{marginRight:5}}>Storage:</Text>
+            <StorageAccountList
+              onChange={(e)=> onSelectedAccountChange(e.target.value)}
+              selector={(a)=>currentStorageAccount?.account?.identifier == a.account.identifier}
+            />
+          </View>        
 
-        <View>
-          <FileInput onChange={(e)=>uploadFiles(e.target.files)} multiple={true} />
-        </View>
-      </View>  
-      
+          <View style={{marginTop: 10}}>
+            <FileInput onChange={(e)=>uploadFiles(e.target.files)} multiple={true} />
+          </View>
+        </>
+        }
+      </View>      
 
       <View style={{marginTop: 20}}>
         <BalancesTable>
