@@ -18,57 +18,38 @@ export function ManageStorageScreen() {
     const nav = useNavigation();
     const [message, setMessage] = useState("");
     const [showLoadingImage, setShowLoadingImage] = useState(false);
-    const [currentStorageAccount, setCurrentStorageAccount] = useState(nav.activeRoute.props?.storageAccount);
-    const [currentStorageInfo, setCurrentStorageInfo] = useState();
     const [currentStorageResize, setCurrentStorageResize] = useState(0);
-    
-    useEffect(()=>{
-        if(!currentStorageAccount)
-            return;
-
-        refreshStorageAccountInfo();
-
-    },[currentStorageAccount]);
-
-    async function refreshStorageAccountInfo(){
-        const accountInfo = await globalContext.shdwDrive
-            .getStorageAccount(new PublicKey(currentStorageAccount.publicKey))
-            .catch(err=>setMessage(err.toString));
-
-        if(accountInfo) {
-            setCurrentStorageInfo(accountInfo);
-        }
-    }
 
     async function onSelectedAccountChange(accountName:string){
-        const foundAccount = globalContext.shdwAccounts.find(a=>a.account?.identifier == accountName);
+        const foundAccount = globalContext.accounts.find(a=>a.account?.identifier == accountName);
         if(foundAccount) {
-            setCurrentStorageAccount(foundAccount);           
+            globalContext.selectAccount(foundAccount);           
         }
     }
 
     async function storageResize() {
-        nav.push("create-storage-screen", {isResize: true, storageInfo: currentStorageInfo})
+        nav.push("create-storage-screen", {isResize: true})
     }
 
     async function storageDelete() {
         setShowLoadingImage(true);
 
-        const delAcct = await globalContext.shdwDrive
-            .deleteStorageAccount(new PublicKey(currentStorageAccount.publicKey),"v2")
+        try{
+        await globalContext.deleteCurrentAccount()
             .catch(err=>setMessage(err.toString()));
+        }catch(err){
+            console.log(err);
+        }
 
-        refreshStorageAccountInfo();
         setShowLoadingImage(false);
     }
 
     async function storageUnDelete() {
         setShowLoadingImage(true);
-        const delAcct = await globalContext.shdwDrive
-            .cancelDeleteStorageAccount(new PublicKey(currentStorageAccount.publicKey),"v2")
-            .catch(err=>setMessage(err.toString()));
 
-        refreshStorageAccountInfo();
+        await globalContext.undeleteCurrentAccount()
+            .catch(err=>setMessage(err.toString()));
+        
         setShowLoadingImage(false);
     }
 
@@ -85,14 +66,12 @@ export function ManageStorageScreen() {
             </View>        
 
             <View style={{marginTop:10}}>
-                { globalContext.shdwAccounts?.length &&
+                { globalContext.accounts?.length &&
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text style={{marginRight: 7}}>Storage:</Text>
                     <StorageAccountList
                         onChange={(e)=> onSelectedAccountChange(e.target.value)}
-                        selector={(a)=>currentStorageAccount?.account?.identifier == a.account.identifier}
                     />
-                    
                 </View>
                 }               
             </View>
@@ -100,7 +79,7 @@ export function ManageStorageScreen() {
             {showLoadingImage ||
                 <View style={{display:'flex', flexDirection:'row', alignContent: 'center', alignSelf: 'center', marginTop: 10}}>
                     <Button style={styles.buttonStyle} onClick={()=>storageResize()}>Resize</Button>
-                    <Button style={styles.buttonStyle} onClick={()=>currentStorageInfo?.to_be_deleted ? storageUnDelete() : storageDelete()}>{currentStorageInfo?.to_be_deleted ? "UnDelete" : "Delete"}</Button>
+                    <Button style={styles.buttonStyle} onClick={()=>globalContext.currentAccountInfo?.to_be_deleted ? storageUnDelete() : storageDelete()}>{globalContext.currentAccountInfo?.to_be_deleted ? "UnDelete" : "Delete"}</Button>
                 </View>
             }
             
@@ -108,55 +87,59 @@ export function ManageStorageScreen() {
             <View style={{marginTop: 20, borderWidth:1, borderColor:'white', margin: 2}}>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Identifier:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.identifier}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.identifier}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>PublicKey:</Text>
-                    <Text style={{color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{currentStorageInfo?.storage_account}</Text>
+                    <Text style={{color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{globalContext.currentAccountInfo?.storage_account}</Text>
+                </View>
+                <View style={{display:'flex', flexDirection:'row'}}>
+                    <Text>Files:</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}>{(globalContext.currentAccountFiles?.length || 0).toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Currently Used Bytes:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {currentStorageInfo?.current_usage?.toString()}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.current_usage?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Reserved Bytes:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {currentStorageInfo?.reserved_bytes?.toString()}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.reserved_bytes?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>               
                     <Text>Immutable:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {currentStorageInfo?.immutable ? 'yes' : 'no'}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.immutable ? 'yes' : 'no'}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>To Be Deleted:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {currentStorageInfo?.to_be_deleted ? 'yes' : 'no'}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.to_be_deleted ? 'yes' : 'no'}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Creation Epoch:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {currentStorageInfo?.creation_epoch?.toString()}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.creation_epoch?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Creation Time:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {new Date((currentStorageInfo?.creation_time || 0) * 1000).toLocaleString("en-us")}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}> {new Date((globalContext.currentAccountInfo?.creation_time || 0) * 1000).toLocaleString("en-us")}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Delete Request Epoch:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.delete_request_epoch?.toString()}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.delete_request_epoch?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Owner1:</Text>
-                    <Text style={{color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{currentStorageInfo?.owner1}</Text>
+                    <Text style={{color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{globalContext.currentAccountInfo?.owner1}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Account Counter Seed:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.account_counter_seed?.toString()}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.account_counter_seed?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Version:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.version}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.version}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Last Fee Epoch:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{currentStorageInfo?.last_fee_epoch?.toString()}</Text>
+                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.last_fee_epoch?.toString()}</Text>
                 </View>
             </View>
 

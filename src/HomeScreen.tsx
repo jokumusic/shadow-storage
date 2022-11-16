@@ -19,136 +19,81 @@ export function HomeScreen() {
   const connection = useConnection();
   const wallet = usePublicKey();
   const nav = useNavigation();
-  const [currentStorageAccount, setCurrentStorageAccount] = useState(nav.activeRoute.props?.storageInfo);
-  const [currentStorageFiles, setCurrentStorageFiles] = useState([]);
   const [message, setMessage] = useState("");
   const [showLoadingImage, setShowLoadingImage] = useState(false);
 
-  useEffect(()=>{
-    if(currentStorageAccount)
-      return;
-
-    if(globalContext.shdwAccounts?.length > 0)
-      setCurrentStorageAccount(globalContext.shdwAccounts[0]);
-
-  },[globalContext.shdwAccounts]);
-
-  useEffect(()=>{
-    console.log('ttt currentStorageAccount change: ', currentStorageAccount);
-    if(!currentStorageAccount?.publicKey)
-      return;
-
-     (async ()=>{ 
-        const fileGroup = await globalContext.shdwDrive.listObjects(new PublicKey(currentStorageAccount.publicKey));
-        console.log('ttt fileGroup: ', fileGroup);
-        setCurrentStorageFiles(fileGroup.keys);
-     })();
-     
-  },[currentStorageAccount]);
-
-
-
   async function uploadFiles(files) {
-    console.log('ttt in uploadfiles', files);
-    if(!currentStorageAccount?.publicKey)
-    {
-      setMessage("a storage account must be selected first");
-      return;
-    }
-
-    const storageKey = new PublicKey(currentStorageAccount.publicKey);
     setShowLoadingImage(true);
-    const uploads = await globalContext.shdwDrive
-      .uploadMultipleFiles(storageKey, files, "v2")
+
+    await globalContext
+      .uploadFiles(files)
       .catch(err=>setMessage(err.toString()));
-
-    if(uploads) {
-      console.log('ttt shdw uploads: ', uploads);
-      const failures = uploads
-        .filter(u=>!u.location)
-        .map(f=> `${f.fileName}: ${f.status}`);
-
-      if(failures) {
-        setMessage(failures.join(failures));
-      } else {
-        setMessage("");
-      }
-
-      const fileGroup = await globalContext.shdwDrive
-        .listObjects(storageKey)
-        .catch(err=>setMessage(err.toString()));
-      
-      if(fileGroup?.keys)
-        setCurrentStorageFiles(fileGroup.keys);
-    }
 
     setShowLoadingImage(false);
   }
 
-  async function listFiles() {
-    console.log('shdw accounts: ', globalContext.shdwAccounts);
-    const accountPubKey = globalContext.shdwAccounts[0].publicKey;
-    console.log('shdw acct pk: ', accountPubKey);
-    const listItems = await globalContext.shdwDrive.listObjects(new PublicKey(accountPubKey));
-    console.log('shdw filelist: ', listItems);
-  }
-
   async function onSelectedAccountChange(accountName:string){
-    console.log('ttt: accountName', accountName);
-    const foundAccount = globalContext.shdwAccounts.find(a=>a.account?.identifier == accountName);
-    console.log('ttt foundaccount: ', foundAccount);
+    const foundAccount = globalContext.accounts.find(a=>a.account?.identifier == accountName);
     if(foundAccount) {
-      setCurrentStorageAccount(foundAccount);
+      globalContext.selectAccount(foundAccount);
+    } else {
+      setMessage(`couldn't find ${accountName} account.`);
     }
   }
 
   return (
     <View style={styles.baseStyle}>
       <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
-      { showLoadingImage &&
+      { (showLoadingImage || globalContext.accounts == undefined) &&
           <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
       }
 
       <View style={{width:'100%', display:'flex', flexDirection:'row', alignContent:'flex-end', justifyContent:'space-between', padding: 5}}>
-      { globalContext.shdwAccounts?.length &&
+      { globalContext.accounts?.length > 0 &&
         
-          <View style={{display:'flex', flexDirection:'row'}}>
-            <Text style={{marginRight:5}}>Storage:</Text>
-            <StorageAccountList
-              style={{fontSize: 14, padding:5, color:'black', height: 30, marginRight:5}}
-              onChange={(e)=> onSelectedAccountChange(e.target.value)}
-              selector={(a)=>currentStorageAccount?.account?.identifier == a.account.identifier}
-            />
-          </View>
-        }
+        <View style={{display:'flex', flexDirection:'row'}}>
+          <Text style={{marginRight:5}}>Storage:</Text>
+          <StorageAccountList
+            style={{fontSize: 14, padding:5, color:'black', height: 30, marginRight:5}}
+            onChange={(e)=> onSelectedAccountChange(e.target.value)}
+          />
+        </View>
+      }
 
         <Button
           style={{padding:4, marginLeft:5, fontSize: 14}}
-          onClick={()=>nav.push("manage-storage-screen", {storageAccount: currentStorageAccount})}
+          onClick={()=>nav.push("manage-storage-screen")}
         >
           Manage Storage
         </Button>        
 
       </View>
 
-      <View style={{marginLeft:10, marginTop: 20}}>
-        <FileInput onChange={(e)=>uploadFiles(e.target.files)} multiple={true} />
-      </View>  
+    {globalContext.currentAccount?.publicKey &&
+    <>
+      { globalContext.currentAccountInfo?.immutable ?
+        <Text style={{color:'red'}}>This storage is marked as immutable and cannot be modified.</Text>
+        :
+        <View style={{marginLeft:10, marginTop: 20}}>
+          <FileInput onChange={(e)=>uploadFiles(e.target.files)} multiple={true} />
+        </View>
+      }
 
-
-      <View style={{marginTop: 20}}>
+      <View style={{display: 'flex', flexDirection:'row', marginTop: 30, paddingLeft:15, fontSize:10, alignSelf:'center'}}>
+        <Text>{`${(globalContext.currentAccountInfo?.reserved_bytes || 0) - (globalContext.currentAccountInfo?.current_usage || 0)} bytes remaining`}</Text>
+        {globalContext.currentAccountInfo?.to_be_deleted &&
+          <Text style={{color:'red',marginLeft:10}}>(is pending deletion)</Text>
+        }
+      </View>
+      <View style={{marginTop: 5}}>
         <BalancesTable>
-          <BalancesTableHead title={`${currentStorageAccount?.account?.identifier} Files`} iconUrl={fileListIconUri} />
+          <BalancesTableHead title={`${globalContext.currentAccount?.account?.identifier} Files (${globalContext.currentAccountFiles?.length})`} iconUrl={fileListIconUri} />
           <BalancesTableContent>
-            { currentStorageFiles?.length && 
-              currentStorageFiles.map((f,i)=>(
+            { globalContext.currentAccountFiles?.length && 
+              globalContext.currentAccountFiles.map((f,i)=>(
                 <BalancesTableRow
                   key={`file_${i}`}
-                  onClick={()=> nav.push("file-view-screen", {
-                      fileName: f,
-                      accountKey: currentStorageAccount.publicKey,
-                    })
-                  }
+                  onClick={()=> nav.push("file-view-screen", {fileName: f}) }
                 >
                   <BalancesTableCell title={f} />
                 </BalancesTableRow>
@@ -158,7 +103,9 @@ export function HomeScreen() {
           <BalancesTableFooter></BalancesTableFooter>
         </BalancesTable>
       </View>
-    
+    </> 
+    } 
+
     </View>
   );
 }

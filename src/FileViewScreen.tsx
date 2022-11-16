@@ -10,18 +10,16 @@ export function FileViewScreen(){
     const globalContext = useContext(GlobalContext);
     const nav = useNavigation();
     const [fileName] = useState(nav.activeRoute.props?.fileName);
-    const [accountKey] = useState(nav.activeRoute.props?.accountKey);
-    const [url] = useState(`https://shdw-drive.genesysgo.net/${accountKey}/${fileName}`);
+    const [url] = useState(`https://shdw-drive.genesysgo.net/${globalContext.currentAccount.publicKey}/${fileName}`);
     const [message, setMessage] = useState("");
     const [showLoadingImage, setShowLoadingImage] = useState(false);
 
     async function deleteFile(){
-        const acctPubKey = new PublicKey(accountKey);
-
         setShowLoadingImage(true);
-        const delFile = await globalContext.shdwDrive
-            .deleteFile(acctPubKey,url,"v2")
+        
+        const delFile = await globalContext.deleteCurrentAccountFile(url)
             .catch(err=>setMessage(err.toString()));
+
         console.log('ttt delFile: ', delFile);
 
         if(delFile) {
