@@ -275,7 +275,6 @@ export function GlobalProvider(props) {
                 .deleteStorageAccount(new PublicKey(currentAccount.publicKey),"v2")
                 .catch(err=>reject(err));
 
-            console.log('delAcct: ', delAcct);
             if(!delAcct)
                 return;                
             
@@ -295,7 +294,6 @@ export function GlobalProvider(props) {
                 .cancelDeleteStorageAccount(new PublicKey(currentAccount.publicKey),"v2")
                 .catch(err=>reject(err));
 
-            console.log('delAcct: ', delAcct);
             if(!delAcct)
                 return;
 

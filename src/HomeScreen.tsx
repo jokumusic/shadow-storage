@@ -1,17 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
-import ReactXnft, { Text, View, Button, TextField, Image,
+import ReactXnft, { Text, View, Button, Image,
   useConnection, usePublicKey, useNavigation,
   BalancesTable, BalancesTableHead, BalancesTableContent, BalancesTableFooter, BalancesTableRow, BalancesTableCell,
-  Custom,
 } from "react-xnft";
 import {GlobalContext} from './GlobalProvider';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
 import {FileInput} from "./components/FileInput";
-import {SelectList} from "./components/SelectList";
-import {Balance} from "./components/Balance";
 import {StorageAccountList} from "./components/StorageAccountList";
 import * as styles from "./styles";
-import {loadingImgUri, fileListIconUri} from "./assets";
+import {fileListIconUri} from "./assets";
+import {Loading} from "./components/Loading";
 
 
 export function HomeScreen() {
@@ -20,7 +17,7 @@ export function HomeScreen() {
   const wallet = usePublicKey();
   const nav = useNavigation();
   const [message, setMessage] = useState("");
-  const [showLoadingImage, setShowLoadingImage] = useState(false);
+  const [showLoadingImage, setShowLoadingImage] = useState(true);
 
   async function uploadFiles(files) {
     setShowLoadingImage(true);
@@ -46,7 +43,7 @@ export function HomeScreen() {
 
       <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
       { (showLoadingImage || globalContext.accounts == undefined) &&
-          <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
+          <Loading />
       }
 
       <View style={{width:'100%', display:'flex', flexDirection:'row', alignContent:'flex-end', justifyContent:'space-between', padding: 5}}>
@@ -61,10 +58,7 @@ export function HomeScreen() {
         </View>
       }
 
-        <Button
-          style={{padding:4, marginLeft:5, fontSize: 14, width:60, marginRight: 5}}
-          onClick={()=>nav.push("manage-storage-screen")}
-        >
+        <Button style={styles.powerButtonStyle} onClick={()=>nav.push("manage-storage-screen")}>
           Manage Storage
         </Button>        
 
@@ -88,12 +82,13 @@ export function HomeScreen() {
       </View>
       <View style={{marginTop: 5}}>
         <BalancesTable>
-          <BalancesTableHead title={`${globalContext.currentAccount?.account?.identifier} Files (${globalContext.currentAccountFiles?.length})`} iconUrl={fileListIconUri} />
+          <BalancesTableHead title={`${globalContext.currentAccount?.account?.identifier} files (${globalContext.currentAccountFiles?.length})`} iconUrl={fileListIconUri} />
           <BalancesTableContent>
             { globalContext.currentAccountFiles?.length && 
               globalContext.currentAccountFiles.map((f,i)=>(
                 <BalancesTableRow
                   key={`file_${i}`}
+                  style={{height:40}}
                   onClick={()=> nav.push("file-view-screen", {fileName: f}) }
                 >
                   <BalancesTableCell title={f} />

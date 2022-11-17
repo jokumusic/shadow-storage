@@ -1,19 +1,18 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect} from "react";
 import ReactXnft, { Text, View, Button, TextField, Image,
-  useConnection, usePublicKey, useNavigation,
+     useNavigation,
 } from "react-xnft";
 import {GlobalContext, STORAGE_UNITS} from './GlobalProvider';
 import * as styles from './styles';
 import {SelectList} from './components/SelectList';
-import {loadingImgUri} from "./assets";
-import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
+import {Loading} from "./components/Loading";
+
 
 const DEFAULT_STORAGE_ACCOUNT_SETTINGS = {
     name: "",
     size: "1",
     unit: "KB",
 };
-
 
 
 export function CreateStorageScreen() {
@@ -67,7 +66,7 @@ export function CreateStorageScreen() {
         <View style={{display:'flex', flexDirection:'column', padding:10, alignContent:'center' }}>
             <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
             { showLoadingImage &&
-                <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
+                <Loading />
             }
 
             {isResize ||

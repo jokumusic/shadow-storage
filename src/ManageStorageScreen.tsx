@@ -4,9 +4,7 @@ import ReactXnft, { Text, View, Button, TextField, Image,
 } from "react-xnft";
 import {GlobalContext} from './GlobalProvider';
 import * as styles from "./styles";
-import {loadingImgUri} from "./assets";
-import {SelectList} from "./components/SelectList";
-import {Balance} from "./components/Balance";
+import {Loading} from "./components/Loading";
 import {StorageAccountList} from "./components/StorageAccountList";
 import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
 
@@ -33,24 +31,20 @@ export function ManageStorageScreen() {
 
     async function storageDelete() {
         setShowLoadingImage(true);
+        setMessage("");
 
         const response = await globalContext.deleteCurrentAccount()
             .catch(err=>setMessage(err.toString()));
-
-        if(response)
-            setMessage("");
 
         setShowLoadingImage(false);
     }
 
     async function storageUnDelete() {
         setShowLoadingImage(true);
+        setMessage("");
 
         const response = await globalContext.undeleteCurrentAccount()
             .catch(err=>setMessage(err.toString()));
-        
-        if(response)
-            setMessage("");
         
         setShowLoadingImage(false);
     }
@@ -60,10 +54,8 @@ export function ManageStorageScreen() {
         <View style={styles.baseStyle}>
             <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
             { showLoadingImage &&
-                <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
+                <Loading />
             }
-
-
         
             <View style={{width:'100%', display:'flex', flexDirection:'row', alignContent:'flex-end', justifyContent: 'space-between', marginTop:10, padding:5}}>
                 { globalContext.accounts?.length &&
@@ -77,7 +69,7 @@ export function ManageStorageScreen() {
                 }         
 
                 <Button
-                    style={{padding:4, marginLeft:5, fontSize: 14, width:60, marginRight: 5}}
+                    style={styles.powerButtonStyle}
                     onClick={()=>nav.push("create-storage-screen")}
                 >
                     Create Storage
@@ -96,59 +88,59 @@ export function ManageStorageScreen() {
             <View style={{display:'flex', flexDirection:'column', width:'99%', marginTop: 20, borderWidth:1, borderColor:'white', margin: 2, padding: 4, fontSize: 15}}>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Name:</Text>
-                    <Text style={{flexWrap:'wrap', color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.identifier}</Text>
+                    <Text style={{flexWrap:'wrap', color:'gray', marginLeft:5}}>{globalContext.currentAccountInfo?.identifier}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row', flexWrap:'wrap'}}>
                     <Text>ID:</Text>
-                    <Text style={{fontSize: 12, color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.storage_account}</Text>
+                    <Text style={{fontSize: 12, color:'gray', marginLeft:5}}>{globalContext.currentAccountInfo?.storage_account}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Files:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{(globalContext.currentAccountFiles?.length || 0).toString()}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}>{(globalContext.currentAccountFiles?.length || 0).toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Used Bytes:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.current_usage?.toLocaleString("en-US")}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}> {globalContext.currentAccountInfo?.current_usage?.toLocaleString("en-US")}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Reserved Bytes:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.reserved_bytes?.toLocaleString("en-US")}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}> {globalContext.currentAccountInfo?.reserved_bytes?.toLocaleString("en-US")}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>               
                     <Text>Immutable:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.immutable ? 'yes' : 'no'}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}> {globalContext.currentAccountInfo?.immutable ? 'yes' : 'no'}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Deleting:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.to_be_deleted ? 'yes' : 'no'}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}> {globalContext.currentAccountInfo?.to_be_deleted ? 'yes' : 'no'}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Delete Request Epoch:</Text>
-                    <Text style={{flexWrap:'wrap', color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.delete_request_epoch?.toString()}</Text>
+                    <Text style={{flexWrap:'wrap', color:'gray', marginLeft:5}}>{globalContext.currentAccountInfo?.delete_request_epoch?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row', flexWrap:'wrap'}}>
                     <Text>Owner:</Text>
-                    <Text style={{fontSize: 12, color:'yellow', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{globalContext.currentAccountInfo?.owner1}</Text>
+                    <Text style={{fontSize: 12, color:'gray', marginLeft:5, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>{globalContext.currentAccountInfo?.owner1}</Text>
                 </View>       
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Creation Epoch:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {globalContext.currentAccountInfo?.creation_epoch?.toString()}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}> {globalContext.currentAccountInfo?.creation_epoch?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row', flexWrap:'wrap'}}>
                     <Text>Creation Time:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}> {new Date((globalContext.currentAccountInfo?.creation_time || 0) * 1000).toLocaleString("en-us")}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}> {new Date((globalContext.currentAccountInfo?.creation_time || 0) * 1000).toLocaleString("en-us")}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Account Counter Seed:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.account_counter_seed?.toString()}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}>{globalContext.currentAccountInfo?.account_counter_seed?.toString()}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Version:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.version}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}>{globalContext.currentAccountInfo?.version}</Text>
                 </View>
                 <View style={{display:'flex', flexDirection:'row'}}>
                     <Text>Last Fee Epoch:</Text>
-                    <Text style={{color:'yellow', marginLeft:5}}>{globalContext.currentAccountInfo?.last_fee_epoch?.toString()}</Text>
+                    <Text style={{color:'gray', marginLeft:5}}>{globalContext.currentAccountInfo?.last_fee_epoch?.toString()}</Text>
                 </View>
             </View>
         </>

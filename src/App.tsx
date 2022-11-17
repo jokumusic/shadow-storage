@@ -13,7 +13,7 @@ export function App() {
     const globalContext = useContext(GlobalContext);
 
     return (
-    <View style={{ background: "black", height: "100%" }}>
+    <View style={{ height: "100%" }}>
       <View style={{display:'flex', alignContent:'center', justifyContent: 'center', alignSelf: 'center', height: 25}}>
         <Balance />
       </View>

@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from "react";
 import ReactXnft, { Text, View, Button, TextField, Image, useNavigation} from "react-xnft";
 import {GlobalContext} from './GlobalProvider';
-import {loadingImgUri} from "./assets";
+import {Loading} from "./components/Loading";
 import * as styles from "./styles";
-import { PublicKey } from '@solana/web3.js';
+
 
 
 export function FileViewScreen(){
@@ -33,7 +33,7 @@ export function FileViewScreen(){
         <View>
             <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
             { showLoadingImage &&
-                <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
+                <Loading />
             }
 
             <View style={{marginTop:20}}>
