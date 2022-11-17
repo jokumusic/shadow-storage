@@ -43,6 +43,11 @@ export function HomeScreen() {
 
   return (
     <View style={styles.baseStyle}>
+      <Button onClick={()=>{
+        console.log('onsig: ', connection?.onSignature);
+        console.dir((connection as any).connection);
+        console.log('window.xnft: ', window.xnft);
+      }}>Checkit</Button>
       <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
       { (showLoadingImage || globalContext.accounts == undefined) &&
           <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>

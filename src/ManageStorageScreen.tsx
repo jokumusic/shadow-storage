@@ -34,12 +34,11 @@ export function ManageStorageScreen() {
     async function storageDelete() {
         setShowLoadingImage(true);
 
-        try{
-        await globalContext.deleteCurrentAccount()
+        const response = await globalContext.deleteCurrentAccount()
             .catch(err=>setMessage(err.toString()));
-        }catch(err){
-            console.log(err);
-        }
+
+        if(response)
+            setMessage("");
 
         setShowLoadingImage(false);
     }
@@ -47,8 +46,11 @@ export function ManageStorageScreen() {
     async function storageUnDelete() {
         setShowLoadingImage(true);
 
-        await globalContext.undeleteCurrentAccount()
+        const response = await globalContext.undeleteCurrentAccount()
             .catch(err=>setMessage(err.toString()));
+        
+        if(response)
+            setMessage("");
         
         setShowLoadingImage(false);
     }

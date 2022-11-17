@@ -26,6 +26,7 @@ export interface GlobalProvider {
     selectAccount(StorageAccountResponse) : Promise<void>,
     refreshCurrentAccountFiles(): Promise<string[]>,
     refreshCurrentAccountInfo(): Promise<StorageAccountInfo>,
+    refreshCurrentAccountData():Promise<void>,
     createAccount(accountName: string, size: number, unit: string): Promise<CreateStorageResponse>,
     uploadFiles(Files): Promise<ShadowBatchUploadResponse[]>,
     deleteCurrentAccount(): Promise<ShadowDriveResponse>,
@@ -51,6 +52,18 @@ export function GlobalProvider(props) {
 
     useEffect(()=>{
         (async () => {            
+            connection.onSignature = async (txid, callback) => {
+                const txConfirmation = await connection!.confirmTransaction(txid,'finalized');
+                console.log('got confirmation: ', txConfirmation);    
+                callback({},confirmation.context)
+            };
+            connection.getSignatureStatuses = async (signatures: string[], config?:any) => {
+                const promises = signatures.map(s=>connection!.confirmTransaction(s,'finalized'));
+                const responses = await Promise.all(promises);
+                const results = responses.map(r=>({context: r.context, confirmations:20, confirmationStatus:'confirmed' }));
+                return {value:results};
+            };
+
             const shdwDrive = await new ShdwDrive(connection,
             {                    
                 signTransaction: async (tx: Transaction) => {
@@ -256,22 +269,17 @@ export function GlobalProvider(props) {
                 reject('you must select an account to delete first.');
                 return;
             }
+ 
+            const delAcct = await drive
+                .deleteStorageAccount(new PublicKey(currentAccount.publicKey),"v2")
+                .catch(err=>reject(err));
 
-            try{
-                const delAcct = await drive
-                    .deleteStorageAccount(new PublicKey(currentAccount.publicKey),"v2")
-                    .catch(err=>reject(err));
-
-                    console.log('delAcct: ', delAcct);
-                if(!delAcct)
-                    return;
-                
-                resolve(delAcct);
-            }catch(err){
-                reject(err);
-            }finally{
-                refreshCurrentAccountData();
-            }
+            console.log('delAcct: ', delAcct);
+            if(!delAcct)
+                return;                
+            
+            refreshCurrentAccountData();
+            resolve(delAcct);   
         });
     }
 
@@ -286,6 +294,7 @@ export function GlobalProvider(props) {
                 .cancelDeleteStorageAccount(new PublicKey(currentAccount.publicKey),"v2")
                 .catch(err=>reject(err));
 
+            console.log('delAcct: ', delAcct);
             if(!delAcct)
                 return;
 
@@ -411,6 +420,7 @@ export function GlobalProvider(props) {
             selectAccount,
             refreshCurrentAccountFiles,
             refreshCurrentAccountInfo,
+            refreshCurrentAccountData,
             createAccount,
             uploadFiles,
             deleteCurrentAccount,
