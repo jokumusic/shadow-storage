@@ -43,11 +43,7 @@ export function HomeScreen() {
 
   return (
     <View style={styles.baseStyle}>
-      <Button onClick={()=>{
-        console.log('onsig: ', connection?.onSignature);
-        console.dir((connection as any).connection);
-        console.log('window.xnft: ', window.xnft);
-      }}>Checkit</Button>
+
       <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
       { (showLoadingImage || globalContext.accounts == undefined) &&
           <Image src={loadingImgUri} style={{ alignSelf: 'center'}}/>
@@ -57,16 +53,16 @@ export function HomeScreen() {
       { globalContext.accounts?.length > 0 &&
         
         <View style={{display:'flex', flexDirection:'row'}}>
-          <Text style={{marginRight:5}}>Storage:</Text>
+          <Text style={{marginRight:5, alignSelf:'center'}}>Storage:</Text>
           <StorageAccountList
-            style={{fontSize: 14, padding:5, color:'black', height: 30, marginRight:5}}
+            style={{fontSize: 14, padding:5, color:'black', height: 30, marginRight:5, alignSelf:'center'}}
             onChange={(e)=> onSelectedAccountChange(e.target.value)}
           />
         </View>
       }
 
         <Button
-          style={{padding:4, marginLeft:5, fontSize: 14}}
+          style={{padding:4, marginLeft:5, fontSize: 14, width:60, marginRight: 5}}
           onClick={()=>nav.push("manage-storage-screen")}
         >
           Manage Storage
@@ -85,7 +81,7 @@ export function HomeScreen() {
       }
 
       <View style={{display: 'flex', flexDirection:'row', marginTop: 30, paddingLeft:15, fontSize:10, alignSelf:'center'}}>
-        <Text>{`${(globalContext.currentAccountInfo?.reserved_bytes || 0) - (globalContext.currentAccountInfo?.current_usage || 0)} bytes remaining`}</Text>
+        <Text>{`${((globalContext.currentAccountInfo?.reserved_bytes || 0) - (globalContext.currentAccountInfo?.current_usage || 0)).toLocaleString("en-US")} bytes remaining`}</Text>
         {globalContext.currentAccountInfo?.to_be_deleted &&
           <Text style={{color:'red',marginLeft:10}}>(is pending deletion)</Text>
         }

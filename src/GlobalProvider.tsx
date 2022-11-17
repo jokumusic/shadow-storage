@@ -144,7 +144,7 @@ export function GlobalProvider(props) {
                     .catch(err=>reject(err));
 
                 if(accts){
-                    setAccounts(accts);
+                    setAccounts(accts.sort((a,b)=> a?.account?.identifier?.toLowerCase() > b?.account?.identifier?.toLowerCase() ? 1 : -1 ));
                     resolve(accts);
                 }
             }catch(err){
@@ -186,8 +186,9 @@ export function GlobalProvider(props) {
                 .catch(err=>reject(err));
 
             if(fileGroup) {
-                setCurrentAccountFiles(fileGroup.keys);
-                resolve(fileGroup.keys);
+                const sortedKeys = fileGroup?.keys?.sort();
+                setCurrentAccountFiles(sortedKeys);
+                resolve(sortedKeys);
             }
         });
     }
