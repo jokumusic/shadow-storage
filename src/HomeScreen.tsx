@@ -17,7 +17,7 @@ export function HomeScreen() {
   const wallet = usePublicKey();
   const nav = useNavigation();
   const [message, setMessage] = useState("");
-  const [showLoadingImage, setShowLoadingImage] = useState(true);
+  const [showLoadingImage, setShowLoadingImage] = useState(false);
 
   async function uploadFiles(files) {
     setShowLoadingImage(true);
