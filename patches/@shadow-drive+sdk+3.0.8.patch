@@ -1,0 +1,22 @@
+diff --git a/node_modules/@shadow-drive/sdk/dist/methods/get-storage-accounts.js b/node_modules/@shadow-drive/sdk/dist/methods/get-storage-accounts.js
+index 079d534..5a4b540 100644
+--- a/node_modules/@shadow-drive/sdk/dist/methods/get-storage-accounts.js
++++ b/node_modules/@shadow-drive/sdk/dist/methods/get-storage-accounts.js
+@@ -25,7 +25,7 @@ function getStorageAccs(version) {
+                     storageAccounts = yield this.program.account.storageAccount.all([
+                         {
+                             memcmp: {
+-                                bytes: this.wallet.publicKey,
++                                bytes: this.wallet.publicKey.toBase58(),
+                                 offset: 39,
+                             },
+                         },
+@@ -35,7 +35,7 @@ function getStorageAccs(version) {
+                     storageAccounts = yield this.program.account.storageAccountV2.all([
+                         {
+                             memcmp: {
+-                                bytes: this.wallet.publicKey,
++                                bytes: this.wallet.publicKey.toBase58(),
+                                 offset: 22,
+                             },
+                         },

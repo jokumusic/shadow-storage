@@ -74,13 +74,13 @@ export function HomeScreen() {
         </View>
       }
 
-      <View style={{display: 'flex', flexDirection:'row', marginTop: 30, paddingLeft:15, fontSize:10, alignSelf:'center'}}>
+      <View style={{display: 'flex', flexDirection:'row', marginTop: 30, paddingLeft:15, fontSize:11, alignSelf:'center'}}>
         <Text>{`${((globalContext.currentAccountInfo?.reserved_bytes || 0) - (globalContext.currentAccountInfo?.current_usage || 0)).toLocaleString("en-US")} bytes remaining`}</Text>
         {globalContext.currentAccountInfo?.to_be_deleted &&
-          <Text style={{color:'red',marginLeft:10}}>(is pending deletion)</Text>
+          <Text style={{color:'red',marginLeft:10}}>(pending deletion)</Text>
         }
       </View>
-      <View style={{marginTop: 5}}>
+      <View style={{marginTop: 2}}>
         <BalancesTable>
           <BalancesTableHead title={`${globalContext.currentAccount?.account?.identifier} files (${globalContext.currentAccountFiles?.length})`} iconUrl={fileListIconUri} />
           <BalancesTableContent>
