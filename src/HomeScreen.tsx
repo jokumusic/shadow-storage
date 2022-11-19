@@ -84,8 +84,7 @@ export function HomeScreen() {
         <BalancesTable>
           <BalancesTableHead title={`${globalContext.currentAccount?.account?.identifier} files (${globalContext.currentAccountFiles?.length})`} iconUrl={fileListIconUri} />
           <BalancesTableContent>
-            { globalContext.currentAccountFiles?.length && 
-              globalContext.currentAccountFiles.map((f,i)=>(
+            { globalContext.currentAccountFiles?.map((f,i)=>(
                 <BalancesTableRow
                   key={`file_${i}`}
                   style={{height:40}}

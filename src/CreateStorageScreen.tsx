@@ -26,6 +26,7 @@ export function CreateStorageScreen() {
     
     async function createStorageAccount() {
         setShowLoadingImage(true);
+        setMessage("");
 
         const newAcct = await globalContext.createAccount(newStorageAccountSettings.name, newStorageAccountSettings.size, newStorageAccountSettings.unit)
             .catch(err=>setMessage(err.toString()));
@@ -39,7 +40,6 @@ export function CreateStorageScreen() {
     }
 
     async function resizeStorageAccount() {
-
         if(!isResize)
         {
             setMessage("This screen is not currently configured for resizing");
@@ -47,6 +47,7 @@ export function CreateStorageScreen() {
         }
             
         setShowLoadingImage(true);
+        setMessage("");
 
         const response = await globalContext.resizeCurrentAccount(newStorageAccountSettings.size, newStorageAccountSettings.unit)
             .catch(err=>setMessage(err.toString()));
