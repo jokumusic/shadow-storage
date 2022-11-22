@@ -29,6 +29,10 @@ export function FileViewScreen(){
         setShowLoadingImage(false);
     }
 
+    async function viewFile() {
+        window.xnft.openWindow(url);
+    }
+
     return (
         <View>
             <Text style={{color:'red', marginBottom: 10}}>{message}</Text>
@@ -37,8 +41,10 @@ export function FileViewScreen(){
             }
 
             <View style={{marginTop:20}}>
-                <Button style={styles.buttonStyle} onClick={()=>deleteFile()}>Delete</Button>
-
+                <View style={{display:'flex', flexDirection:'row'}}>
+                    <Button style={styles.buttonStyle} onClick={()=>deleteFile()}>Delete</Button>
+                    <Button style={styles.buttonStyle} onClick={()=>viewFile()}>View</Button>
+                </View>
                 <Text style={{marginTop:20, whiteSpace: 'pre-wrap', overflowWrap: 'break-word'}}>URL: {url}</Text>
             </View>            
         </View>
