@@ -88,9 +88,10 @@ export function CreateStorageScreen() {
                         value={newStorageAccountSettings.size}          
                         onChange={(e) =>{setNewStorageAccountSettings({...newStorageAccountSettings, size: e.target.value})}}
                         placeholder={"storage account size"}
+                        style={{borderTopRightRadius:  0, borderBottomRightRadius: 0}}
                     />
                     <SelectList
-                        style={{color: 'black', marginLeft: 5}}
+                        style={{color: 'black', marginLeft: 0, borderLeftWidth: 1, borderTopRightRadius: 8, borderBottomRightRadius: 8, }}
                         onChange={(e)=>{setNewStorageAccountSettings({...newStorageAccountSettings, unit: e.target.value})}}
                         options={STORAGE_UNITS.map(u=>({
                             label:u,
