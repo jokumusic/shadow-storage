@@ -16,8 +16,7 @@ install dependencies.
 yarn
 ```
 
-###patch shadow-drive package
-There's a bug in the shadow-drive code that needs to be patched.
+patch shadow-drive package. There's a bug in the shadow-drive code that needs to be patched.
 
 ```
 npx patch-package --patch-dir ./patches
