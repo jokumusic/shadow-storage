@@ -1,19 +1,27 @@
-# xnft-quickstart
+# shadow-storage
 
-Quickstart repo for building your own xNFT.
+Repo for Storage xNFT which runs within backpack and is a UI for interacting with GenesysGo's Shadow-Drive - a decentralized storage network.
 
 ## Developing
+Steps for developing:
 
-Once you've installed Backpack, get started building your xNFT with these steps. Note that the packages here will always use the latest, which correspond to the latest tagged build of Backpack. If you have unexepected issues, make sure your package versions match the app version.
+### Set backpack dev environment up
+see instructions @ https://github.com/coral-xyz/backpack
 
 ### Install
 
-First, install dependencies.
+install dependencies.
 
 ```
 yarn
 ```
 
+###patch shadow-drive package
+There's a bug in the shadow-drive code that needs to be patched.
+
+```
+npx patch-package --patch-dir ./patches
+```
 ### Run the dev server
 
 Then, run the dev server with hot reloading
